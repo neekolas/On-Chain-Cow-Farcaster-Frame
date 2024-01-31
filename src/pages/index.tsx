@@ -1,5 +1,5 @@
-import { BASE_URL } from '@/utils'
-import Head from 'next/head'
+const BASE_URL = "https://on-chain-cow-farcaster-frame-lac.vercel.app/";
+import Head from "next/head";
 
 export default function Home() {
   return (
@@ -14,5 +14,5 @@ export default function Home() {
         <meta property="fc:frame:post_url" content={`${BASE_URL}/api/post`} />
       </Head>
     </>
-  )
+  );
 }
