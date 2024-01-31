@@ -5,6 +5,8 @@
 // addresses won't be able to be extracted from FIDs for minting
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import { SyndicateClient } from "@syndicateio/syndicate-node";
+import { validateFramesPost } from "@xmtp/frames-validator";
+import { FramePostPayload } from "@xmtp/frames-validator/dist/src/types";
 
 const syndicate = new SyndicateClient({
   token: () => {
@@ -32,22 +34,22 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       // sensitive data or funds here. If you'd like, you could validate the
       // Farcaster signature here
       const fid = req.body.untrustedData.fid;
-      const addressFromFid = await getAddrByFid(fid);
+      const addressFromXmtp = await validateXmtpMessage(req.body);
       console.log(
         "Extracted address from FID passed to Syndicate: ",
-        addressFromFid
+        addressFromXmtp
       );
       // Mint the On-Chain Cow NFT. We're not passing in any arguments, since the
       // amount will always be 1
       const mintTx = await syndicate.transact.sendTransaction({
-        projectId: "abcab73a-55d2-4441-a93e-edf95d183b34",
+        projectId: "6babb5eb-d0b0-4a5a-adbd-9718ff26fdaa",
         contractAddress: "0xBeFD018F3864F5BBdE665D6dc553e012076A5d44",
         chainId: 84532,
         functionSignature: "mint(address to)",
         args: {
           // TODO: Change to the user's connected Farcaster address. This is going
           // to WillPapper.eth for now
-          to: addressFromFid,
+          to: addressFromXmtp,
         },
       });
       console.log("Syndicate Transaction ID: ", mintTx.transactionId);
@@ -113,31 +115,39 @@ export default async function (req: VercelRequest, res: VercelResponse) {
   }
 }
 
-// Based on https://github.com/coinbase/build-onchain-apps/blob/b0afac264799caa2f64d437125940aa674bf20a2/template/app/api/frame/route.ts#L13
-async function getAddrByFid(fid: number) {
-  console.log("Extracting address for FID: ", fid);
-  const options = {
-    method: "GET",
-    url: `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}`,
-    headers: {
-      accept: "application/json",
-      api_key: process.env.NEYNAR_API_KEY || "",
-    },
-  };
-  console.log("Fetching user address from Neynar API");
-  const resp = await fetch(options.url, { headers: options.headers });
-  console.log("Response: ", resp);
-  const responseBody = await resp.json(); // Parse the response body as JSON
-  if (responseBody.users) {
-    const userVerifications = responseBody.users[0];
-    if (userVerifications.verifications) {
-      console.log(
-        "User address from Neynar API: ",
-        userVerifications.verifications[0]
-      );
-      return userVerifications.verifications[0].toString();
-    }
+export async function validateXmtpMessage(body: FramePostPayload) {
+  if (body.untrustedData.walletAddress) {
+    const data = await validateFramesPost(body);
+    return data?.verifiedWalletAddress;
   }
-  console.log("Could not fetch user address from Neynar API for FID: ", fid);
-  return "0x0000000000000000000000000000000000000000";
+  throw new Error("No wallet address found in Farcaster Frame post");
 }
+
+// Based on https://github.com/coinbase/build-onchain-apps/blob/b0afac264799caa2f64d437125940aa674bf20a2/template/app/api/frame/route.ts#L13
+// async function getAddrByFid(fid: number) {
+//   console.log("Extracting address for FID: ", fid);
+//   const options = {
+//     method: "GET",
+//     url: `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}`,
+//     headers: {
+//       accept: "application/json",
+//       api_key: process.env.NEYNAR_API_KEY || "",
+//     },
+//   };
+//   console.log("Fetching user address from Neynar API");
+//   const resp = await fetch(options.url, { headers: options.headers });
+//   console.log("Response: ", resp);
+//   const responseBody = await resp.json(); // Parse the response body as JSON
+//   if (responseBody.users) {
+//     const userVerifications = responseBody.users[0];
+//     if (userVerifications.verifications) {
+//       console.log(
+//         "User address from Neynar API: ",
+//         userVerifications.verifications[0]
+//       );
+//       return userVerifications.verifications[0].toString();
+//     }
+//   }
+//   console.log("Could not fetch user address from Neynar API for FID: ", fid);
+//   return "0x0000000000000000000000000000000000000000";
+// }
