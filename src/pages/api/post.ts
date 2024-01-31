@@ -78,6 +78,7 @@ export default async function handler(
       </html>
     `);
     } catch (error) {
+      console.log(error);
       res.status(500).send(`Error: ${(error as any).message}`);
     }
   } else {
@@ -103,7 +104,7 @@ export default async function handler(
         <meta property="fc:frame:button:1" content="How many On-Chain Cows can you mint?" />
         <meta
           name="fc:frame:post_url"
-          content="https://on-chain-cow-farcaster-frame-lac.vercel.app/"
+          content="https://on-chain-cow-farcaster-frame-lac.vercel.app/api/post"
         />
       </head>
     </html>
