@@ -29,7 +29,6 @@ export default async function handler(
       // A full version of this would have auth, but we're not dealing with any
       // sensitive data or funds here. If you'd like, you could validate the
       // Farcaster signature here
-      const fid = req.body.untrustedData.fid;
       const addressFromXmtp = await validateXmtpMessage(req.body);
       console.log(
         "Extracted address from FID passed to Syndicate: ",
@@ -43,8 +42,6 @@ export default async function handler(
         chainId: 84532,
         functionSignature: "mint(address to)",
         args: {
-          // TODO: Change to the user's connected Farcaster address. This is going
-          // to WillPapper.eth for now
           to: addressFromXmtp,
         },
       });
@@ -72,7 +69,7 @@ export default async function handler(
           />
           <meta
             name="fc:frame:post_url"
-            content="https://on-chain-cow-farcaster-frame-lac.vercel.app//api/on-chain-cow-farcaster-frame"
+            content="https://on-chain-cow-farcaster-frame-lac.vercel.app/api/post"
           />
         </head>
       </html>
