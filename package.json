@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@syndicateio/syndicate-node": "^0.0.449",
-    "@xmtp/frames-validator": "^0.1.1",
+    "@xmtp/frames-validator": "^0.5.0",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18"

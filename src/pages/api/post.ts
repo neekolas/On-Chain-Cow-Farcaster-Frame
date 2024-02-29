@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { SyndicateClient } from "@syndicateio/syndicate-node";
 import { validateFramesPost } from "@xmtp/frames-validator";
-import { FramePostPayload } from "@xmtp/frames-validator/dist/src/types";
+import { XmtpOpenFramesRequest } from "@xmtp/frames-validator";
 
 const syndicate = new SyndicateClient({
   token: () => {
@@ -53,10 +53,11 @@ export default async function handler(
         <head>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width" />
+          <meta property="of:accepts:xmtp" content="2024-02-01" />
           <meta property="og:title" content="On-Chain Cow!" />
           <meta
             property="og:image"
-            content="https://on-chain-cow-farcaster-frame-lac.vercel.app//img/on-chain-cow-happy-cow.png"
+            content="https://on-chain-cow-farcaster-frame-lac.vercel.app/img/on-chain-cow-happy-cow.png"
           />
           <meta property="fc:frame" content="vNext" />
           <meta
@@ -87,6 +88,7 @@ export default async function handler(
     <html>
       <head>
         <meta charset="utf-8" />
+        <meta property="of:accepts:xmtp" content="2024-02-01" />
         <meta name="viewport" content="width=device-width" />
         <meta property="og:title" content="On-Chain Cow!" />
         <meta
@@ -109,7 +111,7 @@ export default async function handler(
   }
 }
 
-export async function validateXmtpMessage(body: FramePostPayload) {
+export async function validateXmtpMessage(body: XmtpOpenFramesRequest) {
   if (body.untrustedData.walletAddress) {
     const data = await validateFramesPost(body);
     return data?.verifiedWalletAddress;
