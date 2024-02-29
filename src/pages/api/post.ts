@@ -62,7 +62,7 @@ export default async function handler(
           <meta property="fc:frame" content="vNext" />
           <meta
             property="fc:frame:image"
-            content="https://on-chain-cow-farcaster-frame-lac.vercel.app//img/on-chain-cow-happy-cow.png"
+            content="https://on-chain-cow-farcaster-frame-lac.vercel.app/img/on-chain-cow-happy-cow.png"
           />
           <meta
             property="fc:frame:button:1"
